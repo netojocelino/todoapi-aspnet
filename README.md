@@ -37,11 +37,23 @@ GET /todoitems/{id}
 Para cadastrar um novo item
 ```http
 POST /todoitems
+Content-Type: application/json
+
+{
+  "title": "Estudar C#",
+  "isComplete": false
+}
 ```
 
 Para atualizar um item
 ```http
 PUT /todoitems/{id}
+Content-Type: application/json
+
+{
+    "title": "Jogar Dark Souls II SOTFS",
+    "isComplete": false
+}
 ```
 
 Para remover um item da lista
