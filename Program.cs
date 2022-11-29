@@ -21,18 +21,7 @@ app.MapPost("/todoitems", PostTodo);
 
 app.MapPut("/todoitems/{id}", PutTodo);
 
-app.MapDelete("/todoitems/{id}", async (Int64 id, TodoDB db) => {
-    var todo = await db.Todos.FindAsync(id);
-
-    if (todo is null) {
-        return Results.NotFound();
-    }
-
-    db.Todos.Remove(todo);
-
-    await db.SaveChangesAsync();
-    return Results.Ok(todo);
-});
+app.MapDelete("/todoitems/{id}", DeleteTodo);
 
 app.Run();
 
@@ -78,4 +67,17 @@ static async Task<IResult> PutTodo(Int64 id, Todo input, TodoDB db) {
     await db.SaveChangesAsync();
 
     return Results.NoContent();
+}
+
+static async Task<IResult> DeleteTodo(Int64 id, TodoDB db) {
+    var todo = await db.Todos.FindAsync(id);
+
+    if (todo is null) {
+        return Results.NotFound();
+    }
+
+    db.Todos.Remove(todo);
+
+    await db.SaveChangesAsync();
+    return Results.Ok(todo);
 }
