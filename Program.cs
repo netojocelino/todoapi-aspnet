@@ -19,20 +19,7 @@ app.MapGet("/todoitems/{id}", GetTodoById);
 
 app.MapPost("/todoitems", PostTodo);
 
-app.MapPut("/todoitems/{id}", async (Int64 id, Todo input, TodoDB db) => {
-    var todo = await db.Todos.FindAsync(id);
-    
-    if (todo is null) {
-        return Results.NotFound();
-    }
-
-    todo.Title = input.Title;
-    todo.IsComplete = input.IsComplete;
-
-    await db.SaveChangesAsync();
-
-    return Results.NoContent();
-});
+app.MapPut("/todoitems/{id}", PutTodo);
 
 app.MapDelete("/todoitems/{id}", async (Int64 id, TodoDB db) => {
     var todo = await db.Todos.FindAsync(id);
@@ -75,4 +62,20 @@ static async Task<IResult> PostTodo(Todo todo, TodoDB db) {
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
     return Results.Created($"/todoitems/{todo.ID}", todo);    
+}
+
+
+static async Task<IResult> PutTodo(Int64 id, Todo input, TodoDB db) {
+    var todo = await db.Todos.FindAsync(id);
+    
+    if (todo is null) {
+        return Results.NotFound();
+    }
+
+    todo.Title = input.Title;
+    todo.IsComplete = input.IsComplete;
+
+    await db.SaveChangesAsync();
+
+    return Results.NoContent();
 }
