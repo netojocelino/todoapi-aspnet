@@ -17,11 +17,7 @@ app.MapGet("/todoitems", GetAllTodos );
 app.MapGet("/todoitems/complete", GetCompleteTodos );
 app.MapGet("/todoitems/{id}", GetTodoById);
 
-app.MapPost("/todoitems", async (Todo todo, TodoDB db) => {
-    db.Todos.Add(todo);
-    await db.SaveChangesAsync();
-    return Results.Created($"/todoitems/{todo.ID}", todo);    
-});
+app.MapPost("/todoitems", PostTodo);
 
 app.MapPut("/todoitems/{id}", async (Int64 id, Todo input, TodoDB db) => {
     var todo = await db.Todos.FindAsync(id);
@@ -73,4 +69,10 @@ static async Task<IResult> GetTodoById(Int64 id, TodoDB db) {
         return Results.NotFound();
     }
     return Results.Ok(todo);
+}
+
+static async Task<IResult> PostTodo(Todo todo, TodoDB db) {
+    db.Todos.Add(todo);
+    await db.SaveChangesAsync();
+    return Results.Created($"/todoitems/{todo.ID}", todo);    
 }
