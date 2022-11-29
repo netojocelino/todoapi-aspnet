@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using DTO;
 using Model;
 using Repository;
 
@@ -27,13 +28,17 @@ app.Run();
 
 
 static async Task<IResult> GetAllTodos (TodoDB db) {
-    var todos  = await db.Todos.ToListAsync();
+    var todos  = await db.Todos
+            .Select( item => new TodoItemDTO(item))
+            .ToListAsync();
+    /* TODO: why TypedResults doesn't work? */
     return Results.Ok(todos);
 }
 
 static async Task<IResult> GetCompleteTodos (TodoDB db) {
     var todoCompleted = await db.Todos
         .Where( item => item.IsComplete )
+        .Select( item => new TodoItemDTO(item))
         .ToListAsync();
 
     return Results.Ok(todoCompleted);
@@ -44,19 +49,25 @@ static async Task<IResult> GetTodoById(Int64 id, TodoDB db) {
     if (todo is null) {
         return Results.NotFound();
     }
-    return Results.Ok(todo);
+    return Results.Ok(new TodoItemDTO(todo));
 }
 
-static async Task<IResult> PostTodo(Todo todo, TodoDB db) {
-    db.Todos.Add(todo);
+static async Task<IResult> PostTodo(TodoItemDTO todo, TodoDB db) {
+    var item = new Todo
+    {
+        IsComplete = todo.IsComplete,
+        Title = todo.Title
+    };
+
+    db.Todos.Add(item);
     await db.SaveChangesAsync();
-    return Results.Created($"/todoitems/{todo.ID}", todo);    
+    return Results.Created($"/todoitems/{item.ID}", item);
 }
 
 
-static async Task<IResult> PutTodo(Int64 id, Todo input, TodoDB db) {
+static async Task<IResult> PutTodo(Int64 id, TodoItemDTO input, TodoDB db) {
     var todo = await db.Todos.FindAsync(id);
-    
+
     if (todo is null) {
         return Results.NotFound();
     }
